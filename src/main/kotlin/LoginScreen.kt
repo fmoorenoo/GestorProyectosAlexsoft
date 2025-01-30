@@ -91,12 +91,14 @@ class LoginScreen : Screen {
                             focusedLabelColor = Color(darkblue)
                         ),
                         trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = "",
-                                    tint = Color(0xFF477869)
-                                )
+                            if (password.length > 0) {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                        contentDescription = "",
+                                        tint = Color(0xFF477869)
+                                    )
+                                }
                             }
                         }
                     )
