@@ -1,11 +1,14 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -13,80 +16,134 @@ import cafe.adriel.voyager.core.screen.Screen
 class WelcomeScreen(private val username: String, private val onLogout: () -> Unit) : Screen {
     @Composable
     override fun Content() {
-        Surface(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            shape = RoundedCornerShape(8.dp),
-            color = Color(0xFFF5F5F5),
-            elevation = 4.dp
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = "Welcome, $username!",
-                    style = MaterialTheme.typography.h4.copy(fontSize = 32.sp, color = Color.Black),
-                    modifier = Modifier.padding(bottom = 16.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF518c79), Color(0xFF9fe1c6))
+                    )
                 )
-
-                Button(
-                    onClick = { /* Logic to greet the user */ },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFF5F5F5),
+                elevation = 4.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text(
-                        text = "Saludar al usuario",
-                        style = TextStyle(fontSize = 18.sp, color = Color.White)
-                    )
-                }
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = "Welcome, $username!",
+                            style = TextStyle(
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
-                Button(
-                    onClick = { /* Show role logic */ },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE))
-                ) {
-                    Text(
-                        text = "Mostrar el rol (Gestor)",
-                        style = TextStyle(fontSize = 18.sp, color = Color.White)
-                    )
-                }
+                        Text(
+                            text = "Rol: Fucking Boss",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 24.dp)
+                        )
 
-                Button(
-                    onClick = { /* Navigate to active projects */ },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE))
-                ) {
-                    Text(
-                        text = "Ver proyectos (activos)",
-                        style = TextStyle(fontSize = 18.sp, color = Color.White)
-                    )
-                }
+                        Text(
+                            text = "Proyectos Activos",
+                            style = TextStyle(
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
 
-                Button(
-                    onClick = { /* Navigate to project history */ },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE))
-                ) {
-                    Text(
-                        text = "Historial (proyectos terminados)",
-                        style = TextStyle(fontSize = 18.sp, color = Color.White)
-                    )
-                }
+                        Text(
+                            text = "1. A",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
 
-                Button(
-                    onClick = onLogout,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFB00020))
-                ) {
-                    Text(
-                        text = "Desconectar",
-                        style = TextStyle(fontSize = 18.sp, color = Color.White)
-                    )
+                        Text(
+                            text = "2. AA",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+
+                        Text(
+                            text = "3. AAA",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 24.dp)
+                        )
+
+                        Text(
+                            text = "Historial de proyectos:",
+                            style = TextStyle(
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        Text(
+                            text = "1. E",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+
+                        Text(
+                            text = "2. EE",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                color = Color.DarkGray
+                            ),
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+
+                    Button(
+                        onClick = onLogout,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFB00020))
+                    ) {
+                        Text(
+                            text = "Desconectar",
+                            style = TextStyle(fontSize = 18.sp, color = Color.White)
+                        )
+                    }
                 }
             }
         }
