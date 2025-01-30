@@ -9,8 +9,10 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,79 +29,93 @@ class LoginScreen : Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val navigator = LocalNavigator.current
 
+        var darkblue = 0xFF518c79
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xff666666))
-                .padding(40.dp),
+                .background(Brush.verticalGradient(colors = listOf(Color(darkblue), Color(0xFF9fe1c6))))
+                .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.width(500.dp).padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Surface(
+                modifier = Modifier
+                    .width(450.dp)
+                    .padding(horizontal = 24.dp),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White,
+                elevation = 10.dp
             ) {
-                Text(
-                    text = "Alexsoft",
-                    style = MaterialTheme.typography.h2.copy(color = Color.White)
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text(
-                    text = "Inicio de Sesión",
-                    style = MaterialTheme.typography.h5.copy(color = Color.White)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Usuario", style = TextStyle(color = Color.White)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(color = Color.White),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Alexsoft - Iniciar Sesión",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF333333)
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Usuario") },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(color = Color.Black),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color(darkblue),
+                            unfocusedBorderColor = Color(0xFFCCCCCC),
+                            cursorColor = Color(darkblue),
+                            focusedLabelColor = Color(darkblue)
+                        )
+                    )
 
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña", style = TextStyle(color = Color.White)) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = TextStyle(color = Color.White),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                        cursorColor = Color.White
-                    ),
-                    trailingIcon = {
-                        if (password.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Contraseña") },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(color = Color.Black),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color(darkblue),
+                            unfocusedBorderColor = Color(0xFFCCCCCC),
+                            cursorColor = Color(darkblue),
+                            focusedLabelColor = Color(darkblue)
+                        ),
+                        trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
                                     imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                    contentDescription = "Toggle Password Visibility",
-                                    tint = Color.White
+                                    contentDescription = "",
+                                    tint = Color(0xFF477869)
                                 )
                             }
                         }
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() })) },
+                        enabled = username.isNotEmpty() && password.isNotEmpty(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF648f81))
+                    ) {
+                        Text(
+                            text = "Iniciar Sesión",
+                            style = TextStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        )
                     }
-                )
-
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Button(
-                    onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() })) },
-                    enabled = username.isNotEmpty() && password.isNotEmpty(),
-                    modifier = Modifier.width(200.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xffb3dde8))
-                ) {
-                    Text(text = "Iniciar Sesión", fontSize = 15.sp)
                 }
             }
         }
