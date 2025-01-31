@@ -1,7 +1,12 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,9 +16,28 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.rememberCoroutineScope
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.launch
 
-class WelcomeScreen(private val username: String, private val onLogout: () -> Unit) : Screen {
+data class Project(val name: String, val startDate: String, val description: String)
+
+class WelcomeScreen(
+    private val username: String,
+    private val onLogout: () -> Unit,
+    private val onViewProjects: () -> Unit
+) : Screen {
+    private val activeProjects = listOf(
+        Project("Proyecto A", "01/01/2024", "Descripción A..."),
+        Project("Proyecto B", "15/02/2024", "Descripción B..."),
+        Project("Proyecto C", "10/03/2024", "Descripción C..."),
+        Project("Proyecto D", "05/04/2024", "Descripción D..."),
+        Project("Proyecto E", "20/05/2024", "Descripción E...")
+    )
+
     @Composable
     override fun Content() {
         Box(
@@ -36,9 +60,7 @@ class WelcomeScreen(private val username: String, private val onLogout: () -> Un
                 elevation = 4.dp
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxSize().padding(16.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
@@ -48,95 +70,58 @@ class WelcomeScreen(private val username: String, private val onLogout: () -> Un
                     ) {
                         Text(
                             text = "Welcome, $username!",
-                            style = TextStyle(
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            ),
+                            style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Text(
                             text = "Rol: Fucking Boss",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.DarkGray
-                            ),
+                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray),
                             modifier = Modifier.padding(bottom = 24.dp)
                         )
 
-                        Text(
-                            text = "Proyectos Activos",
-                            style = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
-                            ),
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Proyectos Activos",
+                                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Color.Black),
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = onViewProjects) {
+                                Icon(
+                                    imageVector = Icons.Filled.Visibility,
+                                    contentDescription = "Ver proyectos",
+                                    tint = Color(0xFF00796B)
+                                )
+                            }
+                        }
 
-                        Text(
-                            text = "1. A",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color.DarkGray
-                            ),
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-
-                        Text(
-                            text = "2. AA",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color.DarkGray
-                            ),
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-
-                        Text(
-                            text = "3. AAA",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color.DarkGray
-                            ),
-                            modifier = Modifier.padding(bottom = 24.dp)
-                        )
-
-                        Text(
-                            text = "Historial de proyectos:",
-                            style = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
-                            ),
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        Text(
-                            text = "1. E",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color.DarkGray
-                            ),
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-
-                        Text(
-                            text = "2. EE",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                color = Color.DarkGray
-                            ),
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
+                        val scrollState = rememberLazyListState()
+                        val coroutineScope = rememberCoroutineScope()
+                        LazyRow(
+                            state = scrollState,
+                            modifier = Modifier
+                                .draggable(
+                                    orientation = Orientation.Horizontal,
+                                    state = rememberDraggableState { delta ->
+                                        coroutineScope.launch {
+                                            scrollState.scrollBy(-delta)
+                                        }
+                                    },
+                                )
+                        ) {
+                            items(activeProjects) { project ->
+                                ProjectCard(project)
+                            }
+                        }
                     }
 
                     Button(
                         onClick = onLogout,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFB00020))
                     ) {
                         Text(
@@ -146,6 +131,40 @@ class WelcomeScreen(private val username: String, private val onLogout: () -> Un
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ProjectCard(project: Project) {
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .height(150.dp)
+            .width(190.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = 6.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = project.name,
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Inicio: ${project.startDate}",
+                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = project.description,
+                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

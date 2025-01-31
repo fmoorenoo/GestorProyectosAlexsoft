@@ -106,7 +106,7 @@ class LoginScreen : Screen {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() })) },
+                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { })) },
                         enabled = username.isNotEmpty() && password.isNotEmpty(),
                         modifier = Modifier
                             .fillMaxWidth()
