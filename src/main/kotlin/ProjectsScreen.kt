@@ -91,6 +91,29 @@ fun projectItem(project: Project, onClick: () -> Unit) {
                     color = Color(0xFF005F73)
                 )
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Inicio: ${project.startDate}",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Color(0xFF0A9396)
+                )
+            )
+            Text(
+                text = "Finalización: ${project.endDate}",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = Color(0xFF0A9396)
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = project.description,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            )
         }
     }
 }
