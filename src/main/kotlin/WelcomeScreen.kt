@@ -1,12 +1,11 @@
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,27 +15,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.rememberCoroutineScope
 import cafe.adriel.voyager.core.screen.Screen
-import kotlinx.coroutines.launch
-
-data class Project(val name: String, val startDate: String, val description: String)
 
 class WelcomeScreen(
     private val username: String,
     private val onLogout: () -> Unit,
-    private val onViewProjects: () -> Unit
+    private val onViewProjects: () -> Unit,
+    private val onViewHistory: () -> Unit
 ) : Screen {
-    private val activeProjects = listOf(
-        Project("Proyecto A", "01/01/2024", "Descripción A..."),
-        Project("Proyecto B", "15/02/2024", "Descripción B..."),
-        Project("Proyecto C", "10/03/2024", "Descripción C..."),
-        Project("Proyecto D", "05/04/2024", "Descripción D..."),
-        Project("Proyecto E", "20/05/2024", "Descripción E...")
-    )
 
     @Composable
     override fun Content() {
@@ -45,7 +31,7 @@ class WelcomeScreen(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF518c79), Color(0xFF9fe1c6))
+                        colors = listOf(Color(0xFF005F73), Color(0xFF0A9396), Color(0xFF94D2BD))
                     )
                 )
                 .padding(16.dp),
@@ -55,116 +41,189 @@ class WelcomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFF5F5F5),
-                elevation = 4.dp
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White.copy(alpha = 0.9f),
+                elevation = 16.dp,
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
+                    modifier = Modifier.fillMaxSize().padding(24.dp),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.Start
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Text(
-                            text = "Welcome, $username!",
-                            style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(bottom = 16.dp)
-                        )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = "User Icon",
+                                tint = Color(0xFF005F73),
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Welcome, $username!",
+                                style = TextStyle(
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF005F73),
+                                    shadow = null
+                                )
+                            )
+                        }
 
                         Text(
-                            text = "Rol: Fucking Boss",
-                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray),
+                            text = "Rol: Gestor",
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF0A9396)
+                            ),
                             modifier = Modifier.padding(bottom = 24.dp)
                         )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Proyectos Activos",
-                                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Color.Black),
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            IconButton(onClick = onViewProjects) {
-                                Icon(
-                                    imageVector = Icons.Filled.Visibility,
-                                    contentDescription = "Ver proyectos",
-                                    tint = Color(0xFF00796B)
-                                )
-                            }
-                        }
-
-                        val scrollState = rememberLazyListState()
-                        val coroutineScope = rememberCoroutineScope()
-                        LazyRow(
-                            state = scrollState,
-                            modifier = Modifier
-                                .draggable(
-                                    orientation = Orientation.Horizontal,
-                                    state = rememberDraggableState { delta ->
-                                        coroutineScope.launch {
-                                            scrollState.scrollBy(-delta)
-                                        }
-                                    },
-                                )
-                        ) {
-                            items(activeProjects) { project ->
-                                ProjectCard(project)
-                            }
-                        }
                     }
 
-                    Button(
-                        onClick = onLogout,
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFB00020))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Desconectar",
-                            style = TextStyle(fontSize = 18.sp, color = Color.White)
-                        )
+                        Button(
+                            onClick = onViewProjects,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent
+                            ),
+                            elevation = ButtonDefaults.elevation(
+                                defaultElevation = 8.dp,
+                                pressedElevation = 4.dp
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(Color(0xFF0A9396), Color(0xFF94D2BD))
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.List,
+                                        contentDescription = "Projects",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Ver Proyectos",
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = onViewHistory,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent
+                            ),
+                            elevation = ButtonDefaults.elevation(
+                                defaultElevation = 8.dp,
+                                pressedElevation = 4.dp
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(Color(0xFF0A9396), Color(0xFF94D2BD))
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.History,
+                                        contentDescription = "History",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "Ver Historial de Proyectos",
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = onLogout,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp)
+                                .height(56.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.Transparent
+                            ),
+                            elevation = ButtonDefaults.elevation(
+                                defaultElevation = 8.dp,
+                                pressedElevation = 4.dp
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(Color(0xFFB00020), Color(0xFFD32F2F))
+                                        ),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Desconectar",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun ProjectCard(project: Project) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .height(150.dp)
-            .width(190.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = 6.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = project.name,
-                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black),
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = "Inicio: ${project.startDate}",
-                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.DarkGray),
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = project.description,
-                style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
