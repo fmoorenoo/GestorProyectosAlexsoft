@@ -29,7 +29,7 @@ class LoginScreen : Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         val navigator = LocalNavigator.current
 
-        var darkblue = 0xFF518c79
+        val darkblue = 0xFF518c79
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -91,7 +91,7 @@ class LoginScreen : Screen {
                             focusedLabelColor = Color(darkblue)
                         ),
                         trailingIcon = {
-                            if (password.length > 0) {
+                            if (password.isNotEmpty()) {
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                     Icon(
                                         imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
@@ -106,7 +106,7 @@ class LoginScreen : Screen {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { })) },
+                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { navigator.push(ProjectsScreen()) }, onViewHistory = { navigator.pop()})) },
                         enabled = username.isNotEmpty() && password.isNotEmpty(),
                         modifier = Modifier
                             .fillMaxWidth()
