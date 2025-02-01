@@ -3,7 +3,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
@@ -28,30 +30,32 @@ class WelcomeScreen(
     override fun Content() {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFF005F73), Color(0xFF0A9396), Color(0xFF94D2BD))
-                    )
+                    Brush.verticalGradient(colors = listOf(Color(0xFF005F73), Color(0xFF0A9396), Color(0xFF94D2BD)))
                 )
-                .padding(16.dp),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Surface(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .width(500.dp)
+                    .height(350.dp),
                 shape = RoundedCornerShape(24.dp),
                 color = Color.White.copy(alpha = 0.9f),
-                elevation = 16.dp,
+                elevation = 8.dp,
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.Start
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -65,29 +69,41 @@ class WelcomeScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "Welcome, $username!",
+                                text = "¡Bienvenido, $username!",
                                 style = TextStyle(
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF005F73),
-                                    shadow = null
+                                    color = Color(0xFF005F73)
                                 )
                             )
                         }
 
-                        Text(
-                            text = "Rol: Gestor",
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF0A9396)
-                            ),
-                            modifier = Modifier.padding(bottom = 24.dp)
-                        )
+                        IconButton(
+                            onClick = onLogout,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = "Cerrar sesión",
+                                tint = Color(0xFFB00020),
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
                     }
+
+                    Text(
+                        text = "Rol: Gestor",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF0A9396)
+                        ),
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Button(
@@ -98,42 +114,32 @@ class WelcomeScreen(
                                 .height(56.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent
+                                backgroundColor = Color(0xFF0A9396),
+                                contentColor = Color.White
                             ),
                             elevation = ButtonDefaults.elevation(
-                                defaultElevation = 8.dp,
-                                pressedElevation = 4.dp
-                            ),
-                            contentPadding = PaddingValues(horizontal = 16.dp)
+                                defaultElevation = 4.dp,
+                                pressedElevation = 2.dp
+                            )
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            colors = listOf(Color(0xFF0A9396), Color(0xFF94D2BD))
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.List,
-                                        contentDescription = "Projects",
-                                        tint = Color.White,
-                                        modifier = Modifier.size(24.dp)
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.List,
+                                    contentDescription = "Projects",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Ver Proyectos",
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.SemiBold
                                     )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Ver Proyectos",
-                                        style = TextStyle(
-                                            fontSize = 18.sp,
-                                            color = Color.White,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    )
-                                }
+                                )
                             }
                         }
 
@@ -145,77 +151,29 @@ class WelcomeScreen(
                                 .height(56.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent
+                                backgroundColor = Color(0xFF0A9396),
+                                contentColor = Color.White
                             ),
                             elevation = ButtonDefaults.elevation(
-                                defaultElevation = 8.dp,
-                                pressedElevation = 4.dp
-                            ),
-                            contentPadding = PaddingValues(horizontal = 16.dp)
+                                defaultElevation = 4.dp,
+                                pressedElevation = 2.dp
+                            )
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            colors = listOf(Color(0xFF0A9396), Color(0xFF94D2BD))
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Filled.History,
-                                        contentDescription = "History",
-                                        tint = Color.White,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Ver Historial de Proyectos",
-                                        style = TextStyle(
-                                            fontSize = 18.sp,
-                                            color = Color.White,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                    )
-                                }
-                            }
-                        }
-
-                        Button(
-                            onClick = onLogout,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp)
-                                .height(56.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Transparent
-                            ),
-                            elevation = ButtonDefaults.elevation(
-                                defaultElevation = 8.dp,
-                                pressedElevation = 4.dp
-                            ),
-                            contentPadding = PaddingValues(horizontal = 16.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            colors = listOf(Color(0xFFB00020), Color(0xFFD32F2F))
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.History,
+                                    contentDescription = "History",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    text = "Desconectar",
+                                    text = "Ver Historial de Proyectos",
                                     style = TextStyle(
                                         fontSize = 18.sp,
-                                        color = Color.White,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                 )
