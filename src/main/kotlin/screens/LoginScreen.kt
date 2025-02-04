@@ -1,11 +1,12 @@
+package screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +52,7 @@ class LoginScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Alexsoft - Iniciar Sesión",
+                        text = "Alexsoft  -  Iniciar Sesión",
                         style = TextStyle(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
@@ -63,7 +64,18 @@ class LoginScreen : Screen {
                     OutlinedTextField(
                         value = username,
                         onValueChange = { username = it },
-                        label = { Text("Usuario") },
+                        label = {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                                Icon(
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = "User Icon",
+                                    tint = Color(darkblue),
+                                    modifier = Modifier.size(30.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(text="Usuario")
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = TextStyle(color = Color.Black),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -79,7 +91,18 @@ class LoginScreen : Screen {
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Contraseña") },
+                        label = {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                                Icon(
+                                    imageVector = Icons.Filled.Lock,
+                                    contentDescription = "Passwd Icon",
+                                    tint = Color(darkblue),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(text="Contraseña")
+                            }
+                        },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier.fillMaxWidth(),

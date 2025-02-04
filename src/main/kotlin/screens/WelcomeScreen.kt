@@ -1,9 +1,10 @@
+package screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.History
@@ -71,7 +72,7 @@ class WelcomeScreen(
                             Text(
                                 text = "¡Bienvenido, $username!",
                                 style = TextStyle(
-                                    fontSize = 32.sp,
+                                    fontSize = 26.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF005F73)
                                 )

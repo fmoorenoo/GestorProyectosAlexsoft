@@ -1,3 +1,5 @@
+package screens
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -98,7 +100,7 @@ class ProjectsScreen : Screen {
                 items(filteredProjects) { project ->
                     projectItem(
                         project = project,
-                        onClick = { navigator.push(ProjectScreen(project)) },
+                        onClick = { navigator.push(ProjectScreen()) },
                         onViewMine = {
                             val index = activeProjects.indexOfFirst { it.id == project.id }
                             if (index != -1) {
