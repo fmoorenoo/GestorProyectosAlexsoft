@@ -34,6 +34,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${property("ktor.version")}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${property("ktor.version")}")
     implementation("io.ktor:ktor-client-logging:${property("ktor.version")}")
+    implementation("org.slf4j:slf4j-simple:2.0.9")
+
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${property("coroutines.version")}")
