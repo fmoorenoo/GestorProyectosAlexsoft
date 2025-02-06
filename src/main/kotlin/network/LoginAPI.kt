@@ -18,16 +18,19 @@ import network.NetworkUtils.httpClient
 
 
 fun apiLogIn(usuario: String, password: String, onSuccessResponse: (User) -> Unit) {
-    val url = "http://127.0.0.1:5000/gestor/login"
+    val url = "http://127.0.0.1:5000/login"
     CoroutineScope(Dispatchers.IO).launch {
+        val encryptedPassword = sha512(password)
         val response = httpClient.post(url) {
             contentType(ContentType.Application.Json)
-            setBody(LoginRequest(usuario, sha512(password)))
+            setBody(LoginRequest(usuario, encryptedPassword))
         }
+        val responseBody = response.bodyAsText()
         if (response.status == HttpStatusCode.OK) {
             val user = response.body<User>()
+            onSuccessResponse(user)
         } else {
-            println("Error: ${response.status}, Body: ${response.bodyAsText()}")
+            println("Error en login: ${response.status}, Body: $responseBody")
         }
     }
 }
