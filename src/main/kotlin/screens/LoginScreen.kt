@@ -21,12 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import models.User
+import network.apiLogIn
 
 class LoginScreen : Screen {
     @Composable
     override fun Content() {
         var username by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
+        var user: User by remember { mutableStateOf(User(0, 0, "", "")) }
         var passwordVisible by remember { mutableStateOf(false) }
         val navigator = LocalNavigator.current
 
@@ -129,7 +132,14 @@ class LoginScreen : Screen {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { navigator.push(ProjectsScreen()) }, onViewHistory = { navigator.pop()})) },
+                        onClick = {
+                            apiLogIn(username, password){
+                                user = it
+                                if(!user.nombre.isEmpty()){
+                                    navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { navigator.push(ProjectsScreen()) }, onViewHistory = { navigator.pop()}))
+                                }
+                            }
+                        },
                         enabled = username.isNotEmpty() && password.isNotEmpty(),
                         modifier = Modifier
                             .fillMaxWidth()
