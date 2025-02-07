@@ -50,7 +50,13 @@ class ProjectsScreen(private val gestorId: Int) : Screen {
                 apiActiveProjects(
                     onSuccessResponse = { activeProjects ->
                         projects = activeProjects
-                        isLoading = false
+                        apiProjectsByGestor(
+                            idGestor = gestorId,
+                            onSuccessResponse = { gestorProjects ->
+                                myProjectsIds = gestorProjects.map { it.id }
+                                isLoading = false
+                            }
+                        )
                     }
                 )
             }
