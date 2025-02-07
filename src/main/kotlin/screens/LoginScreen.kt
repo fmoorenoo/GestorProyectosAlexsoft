@@ -140,7 +140,7 @@ class LoginScreen : Screen {
                                         WelcomeScreen(
                                             username = username,
                                             onLogout = { navigator.pop() },
-                                            onViewProjects = { navigator.push(ProjectsScreen()) },
+                                            onViewProjects = { navigator.push(ProjectsScreen(user.idGestor)) },
                                             onViewHistory = { navigator.push(HistoryScreen()) }
                                         )
                                     )
