@@ -14,7 +14,6 @@ fun apiCreateTask(
     nombre: String,
     descripcion: String,
     estimacion: Int,
-    fechaCreacion: String,
     fechaFinalizacion: String?,
     programadorId: Int,
     proyectoId: Int,
@@ -26,7 +25,6 @@ fun apiCreateTask(
         nombre = nombre,
         descripcion = descripcion,
         estimacion = estimacion,
-        fecha_creacion = fechaCreacion,
         fecha_finalizacion = fechaFinalizacion,
         programador = programadorId,
         proyecto = proyectoId
