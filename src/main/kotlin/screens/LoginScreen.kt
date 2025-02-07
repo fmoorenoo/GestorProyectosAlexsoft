@@ -136,7 +136,14 @@ class LoginScreen : Screen {
                             apiLogIn(username, password){
                                 user = it
                                 if(!user.nombre.isEmpty()){
-                                    navigator?.push(WelcomeScreen(username = username, onLogout = { navigator.pop() }, onViewProjects = { navigator.push(ProjectsScreen()) }, onViewHistory = { navigator.pop()}))
+                                    navigator?.push(
+                                        WelcomeScreen(
+                                            username = username,
+                                            onLogout = { navigator.pop() },
+                                            onViewProjects = { navigator.push(ProjectsScreen()) },
+                                            onViewHistory = { navigator.push(HistoryScreen()) }
+                                        )
+                                    )
                                 }
                             }
                         },
