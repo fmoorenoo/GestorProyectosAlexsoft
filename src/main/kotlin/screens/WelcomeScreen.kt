@@ -135,7 +135,7 @@ class WelcomeScreen(
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    text = "Ver Proyectos",
+                                    text = "Ver proyectos activos",
                                     style = TextStyle(
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.SemiBold
@@ -172,7 +172,7 @@ class WelcomeScreen(
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    text = "Ver Historial de Proyectos",
+                                    text = "Ver proyectos acabados",
                                     style = TextStyle(
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.SemiBold
