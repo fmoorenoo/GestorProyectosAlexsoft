@@ -21,8 +21,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import models.Project
 
-class ProjectScreen : Screen {
+class ProjectScreen(private val project: Project) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -30,7 +31,7 @@ class ProjectScreen : Screen {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Nombre del Proyecto") },
+                    title = { Text(text = project.nombre) },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -58,7 +59,7 @@ class ProjectScreen : Screen {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Nombre: Proyecto A",
+                            text = "Nombre: " + project.nombre,
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -67,14 +68,14 @@ class ProjectScreen : Screen {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Fecha de inicio: 01/01/2024",
+                            text = "Fecha de inicio: " + project.fechaInicio,
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 color = Color(0xFF0A9396)
                             )
                         )
                         Text(
-                            text = "Fecha de finalización: 31/12/2024",
+                            text = "Fecha de finalización: " + project.fechaFinalizacion,
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 color = Color(0xFF0A9396)
@@ -82,7 +83,7 @@ class ProjectScreen : Screen {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Descripción: Descripción del proyecto...",
+                            text = "Descripción: " + project.descripcion,
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 color = Color.Black
