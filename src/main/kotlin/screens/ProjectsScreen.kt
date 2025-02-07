@@ -8,7 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,29 +21,39 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import models.Project
+import network.apiActiveProjects
+import network.apiProjectsByGestor
 
-data class Project(
-    val id: Int,
-    val name: String,
-    val startDate: String,
-    val endDate: String,
-    val description: String,
-    var isMine: Boolean
-)
-
-class ProjectsScreen : Screen {
+class ProjectsScreen(private val gestorId: Int) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var showOnlyMine by remember { mutableStateOf(false) } // Estado para el filtro
-        val activeProjects = remember {
-            mutableStateListOf(
-                Project(1, "Proyecto A", "01/01/2024", "31/12/2024", "Descripción del Proyecto A...", true),
-                Project(2, "Proyecto B", "15/02/2024", "30/11/2024", "Descripción del Proyecto B...", false),
-                Project(3, "Proyecto C", "10/03/2024", "15/10/2024", "Descripción del Proyecto C...", true),
-                Project(4, "Proyecto D", "05/04/2024", "20/09/2024", "Descripción del Proyecto D...", false),
-                Project(5, "Proyecto E", "20/05/2024", "10/08/2024", "Descripción del Proyecto E...", true)
-            )
+        var projects by remember { mutableStateOf<List<Project>>(emptyList()) }
+        var isLoading by remember { mutableStateOf(true) }
+        var showOnlyMine by remember { mutableStateOf(false) }
+        var myProjectsIds by remember { mutableStateOf<List<Int>>(emptyList()) }
+
+        LaunchedEffect(showOnlyMine) {
+            isLoading = true
+
+            if (showOnlyMine) {
+                apiProjectsByGestor(
+                    idGestor = gestorId,
+                    onSuccessResponse = { gestorProjects ->
+                        myProjectsIds = gestorProjects.map { it.id }
+                        projects = gestorProjects
+                        isLoading = false
+                    }
+                )
+            } else {
+                apiActiveProjects(
+                    onSuccessResponse = { activeProjects ->
+                        projects = activeProjects
+                        isLoading = false
+                    }
+                )
+            }
         }
 
         Scaffold(
@@ -85,30 +96,40 @@ class ProjectsScreen : Screen {
             },
             backgroundColor = Color(0xFFF0F0F0)
         ) { paddingValues ->
-            val filteredProjects = if (showOnlyMine) {
-                activeProjects.filter { it.isMine }
-            } else {
-                activeProjects
-            }
-
-            LazyColumn(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
             ) {
-                items(filteredProjects) { project ->
-                    projectItem(
-                        project = project,
-                        onClick = { navigator.push(ProjectScreen()) },
-                        onViewMine = {
-                            val index = activeProjects.indexOfFirst { it.id == project.id }
-                            if (index != -1) {
-                                activeProjects[index] = activeProjects[index].copy(isMine = !activeProjects[index].isMine)
+                when {
+                    isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    projects.isNotEmpty() -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            items(projects) { project ->
+                                val isMine = myProjectsIds.contains(project.id)
+                                projectItem(
+                                    project = project,
+                                    isMine = isMine,
+                                    navigator = navigator
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    else -> {
+                        Text(
+                            text = "No hay proyectos disponibles",
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.Gray,
+                            style = TextStyle(fontSize = 16.sp)
+                        )
+                    }
                 }
             }
         }
@@ -116,11 +137,11 @@ class ProjectsScreen : Screen {
 }
 
 @Composable
-fun projectItem(project: Project, onClick: () -> Unit, onViewMine: () -> Unit) {
+fun projectItem(project: Project, isMine: Boolean, navigator: cafe.adriel.voyager.navigator.Navigator) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { navigator.push(ProjectScreen(project)) },
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
@@ -134,34 +155,29 @@ fun projectItem(project: Project, onClick: () -> Unit, onViewMine: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = project.name,
+                    text = project.nombre,
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF005F73)
                     )
                 )
-                IconButton(
-                    onClick = { onViewMine() },
-                    modifier = Modifier.size(30.dp)
-                ) {
-                    Icon(
-                        imageVector = if (project.isMine) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                        contentDescription = "Añadir a mis proyectos",
-                        tint = if (project.isMine) Color(0xFFf1a56a) else Color.Gray
-                    )
-                }
+                Icon(
+                    imageVector = if (isMine) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                    contentDescription = if (isMine) "Proyecto propio" else "Proyecto no propio",
+                    tint = if (isMine) Color(0xFFf1a56a) else Color.Gray
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Inicio: ${project.startDate}",
+                text = "Inicio: ${project.fechaInicio}",
                 style = TextStyle(
                     fontSize = 16.sp,
                     color = Color(0xFF0A9396)
                 )
             )
             Text(
-                text = "Finalización: ${project.endDate}",
+                text = "Finalización: ${project.fechaFinalizacion}",
                 style = TextStyle(
                     fontSize = 16.sp,
                     color = Color(0xFF0A9396)
@@ -169,7 +185,7 @@ fun projectItem(project: Project, onClick: () -> Unit, onViewMine: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = project.description,
+                text = project.descripcion,
                 style = TextStyle(
                     fontSize = 14.sp,
                     color = Color.Black
