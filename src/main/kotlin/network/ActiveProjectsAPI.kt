@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import models.Project
 import network.NetworkUtils.httpClient
 
-fun apiAllProjects(onSuccessResponse: (List<Project>) -> Unit) {
-    val url = "http://127.0.0.1:5000/proyecto/proyectos"
+fun apiActiveProjects(onSuccessResponse: (List<Project>) -> Unit) {
+    val url = "http://127.0.0.1:5000/proyecto/proyectos_activos"
     CoroutineScope(Dispatchers.IO).launch {
         try {
             val response = httpClient.get(url)
