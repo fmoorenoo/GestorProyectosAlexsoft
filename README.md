@@ -13,6 +13,11 @@ https://github.com/fmoorenoo/metodos_alexsoftAPI
   
 <br>
 
+
+## 📝 Indicaciones
+- Error en el script de la base de datos, impidiendo asignar más de un programador por proyecto.
+
+<br>
 ## 📷 Capturas de la interfaz
 | Login | Welcome |
 | -------------- | --------------- |
