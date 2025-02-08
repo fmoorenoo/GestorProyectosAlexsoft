@@ -46,8 +46,6 @@ class ProjectScreen(private val project: Project) : Screen {
         var isLoadingTasks by remember { mutableStateOf(true) }
         var isLoadingProgrammers by remember { mutableStateOf(true) }
         var showDialog by remember { mutableStateOf(false) }
-        var showAssignDialog by remember { mutableStateOf(false) }
-        var selectedProgrammer by remember { mutableStateOf<Programmer?>(null) }
         var recomposeTrigger by remember { mutableStateOf(false) }
         var assignedProgrammers by remember { mutableStateOf<List<Int>>(emptyList()) }
 
@@ -194,38 +192,6 @@ class ProjectScreen(private val project: Project) : Screen {
             }
         }
 
-        if (showAssignDialog) {
-            AlertDialog(
-                onDismissRequest = { showAssignDialog = false },
-                title = { Text("Confirmar asignación") },
-                text = { Text("¿Deseas asignar a ${selectedProgrammer?.nombre} al proyecto?") },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            selectedProgrammer?.let { programmer ->
-                                apiAssignProgrammerToProject(
-                                    programadorId = programmer.programador_id,
-                                    proyectoId = project.id,
-                                    onSuccessResponse = {
-                                        showAssignDialog = false
-                                        recomposeTrigger = !recomposeTrigger
-                                    },
-                                    onError = { showAssignDialog = false }
-                                )
-                            }
-                        }
-                    ) {
-                        Text("Asignar")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { showAssignDialog = false }) {
-                        Text("Cancelar")
-                    }
-                }
-            )
-        }
-
         if (showDialog) {
             CreateTaskDialog(
                 projectId = project.id,
@@ -238,8 +204,6 @@ class ProjectScreen(private val project: Project) : Screen {
         }
     }
 }
-
-
 
 
 @Composable
@@ -285,24 +249,56 @@ fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
     }
 }
 
-    @Composable
-    fun ProgrammerItem(programmer: Programmer, isAssigned: Boolean, onAssignClick: () -> Unit) {
-        Card(
-            modifier = Modifier.width(250.dp).padding(8.dp),
-            shape = RoundedCornerShape(12.dp),
-            elevation = 4.dp,
-            backgroundColor = Color.White
+
+@Composable
+fun ProgrammerItem(programmer: Programmer, isAssigned: Boolean, onAssignClick: () -> Unit) {
+    Card(
+        modifier = Modifier.width(250.dp).padding(8.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = 4.dp,
+        backgroundColor = if (!isAssigned) Color.White  else Color(0xffdaf8ff)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(imageVector = Icons.Filled.Person, contentDescription = "Programador", tint = Color(0xFF0A9396))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = programmer.nombre, fontWeight = FontWeight.Bold)
-                Text(text = programmer.email, style = TextStyle(fontSize = 12.sp, color = Color.Gray))
-                if (!isAssigned) {
-                    Button(onClick = onAssignClick) {
-                        Text("Asignar")
-                    }
+            Icon(
+                imageVector = Icons.Filled.Person,
+                contentDescription = "Programador",
+                tint = Color(0xFF0A9396)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = programmer.nombre,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = programmer.email,
+                style = TextStyle(fontSize = 12.sp, color = Color.Gray)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (!isAssigned) {
+                Button(
+                    onClick = onAssignClick,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF0A9396),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Asignar")
                 }
+            } else {
+                Text(
+                    text = "Asignado",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = Color(0xFF0A9396),
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
             }
         }
     }
+}
+
