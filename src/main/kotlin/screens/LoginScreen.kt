@@ -31,13 +31,17 @@ class LoginScreen : Screen {
         var password by remember { mutableStateOf("") }
         var user: User by remember { mutableStateOf(User(0, 0, "", "")) }
         var passwordVisible by remember { mutableStateOf(false) }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
         val navigator = LocalNavigator.current
 
         val darkblue = 0xFF518c79
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(colors = listOf(Color(darkblue), Color(0xFF9fe1c6))))
+                .background(
+                    Brush.verticalGradient(colors = listOf(Color(0xFF005F73), Color(0xFF0A9396), Color(0xFF94D2BD)))
+                )
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -68,7 +72,7 @@ class LoginScreen : Screen {
                         value = username,
                         onValueChange = { username = it },
                         label = {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Filled.Person,
                                     contentDescription = "User Icon",
@@ -76,7 +80,7 @@ class LoginScreen : Screen {
                                     modifier = Modifier.size(30.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Text(text="Usuario")
+                                Text(text = "Usuario")
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -95,7 +99,7 @@ class LoginScreen : Screen {
                         value = password,
                         onValueChange = { password = it },
                         label = {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Filled.Lock,
                                     contentDescription = "Passwd Icon",
@@ -103,7 +107,7 @@ class LoginScreen : Screen {
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Text(text="Contraseña")
+                                Text(text = "Contraseña")
                             }
                         },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -129,23 +133,40 @@ class LoginScreen : Screen {
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage!!,
+                            color = Color.Red,
+                            fontSize = 17.sp,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
                         onClick = {
-                            apiLogIn(username, password){
-                                user = it
-                                if(!user.nombre.isEmpty()){
-                                    navigator?.push(
-                                        WelcomeScreen(
-                                            username = username,
-                                            onLogout = { navigator.pop() },
-                                            onViewProjects = { navigator.push(ProjectsScreen(user.idGestor)) },
-                                            onViewHistory = { navigator.push(HistoryScreen()) }
+                            errorMessage = null
+                            apiLogIn(username, password,
+                                onSuccessResponse = {
+                                    user = it
+                                    if (user.nombre.isNotEmpty()) {
+                                        navigator?.push(
+                                            WelcomeScreen(
+                                                username = username,
+                                                onLogout = { navigator.pop() },
+                                                onViewProjects = { navigator.push(ProjectsScreen(user.idGestor)) },
+                                                onViewHistory = { navigator.push(HistoryScreen()) }
+                                            )
                                         )
-                                    )
+                                    }
+                                },
+                                onError = { errorMsg ->
+                                    errorMessage = errorMsg
                                 }
-                            }
+                            )
                         },
                         enabled = username.isNotEmpty() && password.isNotEmpty(),
                         modifier = Modifier
