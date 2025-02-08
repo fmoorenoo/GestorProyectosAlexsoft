@@ -27,6 +27,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import models.Project
 import models.Task
+import network.apiCreateTask
 import network.apiGetTasksByProject
 
 class ProjectScreen(private val project: Project) : Screen {
@@ -35,11 +36,14 @@ class ProjectScreen(private val project: Project) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
+        var showDialog by remember { mutableStateOf(false) }
+        var recomposeTrigger by remember { mutableStateOf(false) }
 
         val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(project.id) {
+        LaunchedEffect(project.id, recomposeTrigger) {
+            isLoading = true
             apiGetTasksByProject(
                 projectId = project.id,
                 onSuccessResponse = { fetchedTasks ->
@@ -73,36 +77,6 @@ class ProjectScreen(private val project: Project) : Screen {
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = 4.dp,
-                    backgroundColor = Color.White
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Nombre: " + project.nombre,
-                            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73))
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Fecha de inicio: " + project.fechaInicio,
-                            style = TextStyle(fontSize = 16.sp, color = Color(0xFF0A9396))
-                        )
-                        Text(
-                            text = "Fecha de finalización: " + project.fechaFinalizacion,
-                            style = TextStyle(fontSize = 16.sp, color = Color(0xFF0A9396))
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Descripción: " + project.descripcion,
-                            style = TextStyle(fontSize = 14.sp, color = Color.Black)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Text(
                     text = "Tareas del Proyecto",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73)),
@@ -139,8 +113,7 @@ class ProjectScreen(private val project: Project) : Screen {
                 }
 
                 Button(
-                    onClick = {
-                    },
+                    onClick = { showDialog = true },
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0A9396))
                 ) {
@@ -152,13 +125,24 @@ class ProjectScreen(private val project: Project) : Screen {
                 }
             }
         }
+
+        if (showDialog) {
+            CreateTaskDialog(
+                projectId = project.id,
+                onDismiss = { showDialog = false },
+                onTaskCreated = {
+                    showDialog = false
+                    recomposeTrigger = !recomposeTrigger
+                }
+            )
+        }
     }
 }
 
 @Composable
 fun TaskItem(task: Task) {
     Card(
-        modifier = Modifier.width(220.dp), // Se ajusta el tamaño de la tarjeta
+        modifier = Modifier.width(220.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
@@ -180,4 +164,144 @@ fun TaskItem(task: Task) {
             )
         }
     }
+}
+
+@Composable
+fun CreateTaskDialog(projectId: Int, onDismiss: () -> Unit, onTaskCreated: () -> Unit) {
+    var nombre by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var estimacion by remember { mutableStateOf("") }
+    var isCreating by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = { if (!isCreating) onDismiss() },
+        title = {
+            Text(
+                text = "Crear Nueva Tarea",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0A9396)
+                ),
+                modifier = Modifier.height(800.dp)
+            )
+        },
+
+        text = {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A9396),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color(0xFF0A9396),
+                        focusedLabelColor = Color(0xFF0A9396),
+                        unfocusedLabelColor = Color.Gray
+                    )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { descripcion = it },
+                    label = { Text("Descripción") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A9396),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color(0xFF0A9396),
+                        focusedLabelColor = Color(0xFF0A9396),
+                        unfocusedLabelColor = Color.Gray
+                    )
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = estimacion,
+                    onValueChange = { estimacion = it },
+                    label = { Text("Estimación (horas)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF0A9396),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = Color(0xFF0A9396),
+                        focusedLabelColor = Color(0xFF0A9396),
+                        unfocusedLabelColor = Color.Gray
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (nombre.isNotBlank() && descripcion.isNotBlank() && estimacion.isNotBlank()) {
+                        isCreating = true
+                        apiCreateTask(
+                            nombre = nombre,
+                            descripcion = descripcion,
+                            estimacion = estimacion.toInt(),
+                            fechaFinalizacion = null,
+                            programadorId = 1,
+                            proyectoId = projectId,
+                            onSuccessResponse = {
+                                isCreating = false
+                                onTaskCreated()
+                            },
+                            onError = {
+                                isCreating = false
+                            }
+                        )
+                    }
+                },
+                enabled = !isCreating,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFF0A9396),
+                    contentColor = Color.White
+                )
+            ) {
+                if (isCreating) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                } else {
+                    Text(
+                        text = "Crear",
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = { if (!isCreating) onDismiss() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.LightGray,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text(
+                    text = "Cancelar",
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                )
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        backgroundColor = Color.White,
+        contentColor = Color.Black
+    )
 }
