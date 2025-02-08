@@ -199,7 +199,8 @@ class ProjectScreen(private val project: Project) : Screen {
                 onTaskCreated = {
                     showDialog = false
                     recomposeTrigger = !recomposeTrigger
-                }
+                },
+                programmers = programmers
             )
         }
     }
