@@ -18,12 +18,16 @@ fun apiGetAssignedProgrammers(
 
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val response = httpClient.get(url)
+            val response: HttpResponse = httpClient.get(url)
             val responseBody = response.bodyAsText()
 
             if (response.status == HttpStatusCode.OK) {
-                val assignedIds = response.body<List<Int>>()
-                onSuccessResponse(assignedIds)
+                try {
+                    val assignedIds = response.body<List<Int>>()
+                    onSuccessResponse(assignedIds)
+                } catch (e: Exception) {
+                    onError("Error al deserializar la respuesta: ${e.message}")
+                }
             } else {
                 onError("Error: ${response.status}, Body: $responseBody")
             }
