@@ -2,9 +2,15 @@ package screens
 
 import CreateTaskDialog
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -41,6 +47,7 @@ class ProjectScreen(private val project: Project) : Screen {
         var recomposeTrigger by remember { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
+        val scrollState = rememberLazyListState()
 
         LaunchedEffect(project.id, recomposeTrigger) {
             isLoadingTasks = true
@@ -90,6 +97,10 @@ class ProjectScreen(private val project: Project) : Screen {
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
+                ProjectDetails(project)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
                     text = "Tareas del Proyecto",
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73)),
@@ -143,8 +154,19 @@ class ProjectScreen(private val project: Project) : Screen {
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                    LazyRow(
+                        state = scrollState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .draggable(
+                                orientation = Orientation.Horizontal,
+                                state = rememberDraggableState { delta ->
+                                    coroutineScope.launch {
+                                        scrollState.scrollBy(-delta)
+                                    }
+                                }
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(programmers) { programmer ->
                             ProgrammerItem(programmer = programmer)
@@ -168,11 +190,34 @@ class ProjectScreen(private val project: Project) : Screen {
 }
 
 @Composable
+fun ProjectDetails(project: Project) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Detalles del Proyecto",
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Nombre: ${project.nombre}", style = TextStyle(fontSize = 16.sp, color = Color.Black))
+            Text(text = "Descripción: ${project.descripcion}", style = TextStyle(fontSize = 14.sp, color = Color.Gray))
+            Text(text = "Fecha de Creación: ${project.fechaCreacion}", style = TextStyle(fontSize = 14.sp, color = Color.Gray))
+            Text(text = "Fecha de Finalización: ${project.fechaFinalizacion}", style = TextStyle(fontSize = 14.sp, color = Color.Gray))
+        }
+    }
+}
+
+
+@Composable
 fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(8.dp)
             .clickable { navigator.push(TasksScreen(task)) },
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
@@ -183,11 +228,6 @@ fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
                 text = task.nombre,
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73))
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = task.descripcion,
-                style = TextStyle(fontSize = 14.sp, color = Color.Black)
-            )
         }
     }
 }
@@ -195,31 +235,16 @@ fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
 @Composable
 fun ProgrammerItem(programmer: Programmer) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.width(250.dp).padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(imageVector = Icons.Filled.Person, contentDescription = "Programador", tint = Color(0xFF0A9396))
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(
-                    text = programmer.nombre,
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                )
-                Text(
-                    text = "Email: ${programmer.email}",
-                    style = TextStyle(fontSize = 14.sp, color = Color.Gray)
-                )
-                Text(
-                    text = "Área: ${programmer.area}",
-                    style = TextStyle(fontSize = 14.sp, color = Color.Gray)
-                )
-            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = programmer.nombre, fontWeight = FontWeight.Bold)
+            Text(text = programmer.email, style = TextStyle(fontSize = 12.sp, color = Color.Gray))
         }
     }
 }
