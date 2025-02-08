@@ -124,7 +124,7 @@ class ProjectScreen(private val project: Project) : Screen {
                         modifier = Modifier.fillMaxWidth().height(200.dp)
                     ) {
                         items(tasks) { task ->
-                            TaskItem(task = task, navigator = navigator)
+                            TaskItem(task = task, navigator = navigator, programmers = programmers)
                         }
                     }
                 }
@@ -231,12 +231,12 @@ fun ProjectDetails(project: Project) {
 
 
 @Composable
-fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
+fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator, programmers: List<Programmer>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { navigator.push(TasksScreen(task)) },
+            .clickable { navigator.push(TasksScreen(task, programmers)) },
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
