@@ -15,8 +15,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import models.Task
 
-class TasksScreen : Screen {
+class TasksScreen(private val task: Task) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -52,7 +53,7 @@ class TasksScreen : Screen {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Nombre: Tarea 1",
+                            text = "Nombre: ${task.nombre}",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -61,7 +62,7 @@ class TasksScreen : Screen {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Descripción: Descripción de la tarea...",
+                            text = "Descripción: ${task.descripcion}",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 color = Color.Black
@@ -69,7 +70,7 @@ class TasksScreen : Screen {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Programadores: Programador 1, Programador 2",
+                            text = "Programador: ${task.programador}",
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 color = Color.Gray
