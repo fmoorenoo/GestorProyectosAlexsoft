@@ -1,19 +1,16 @@
 package screens
 
 import CreateTaskDialog
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,30 +25,46 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import models.Project
 import models.Task
+import models.Programmer
 import network.apiGetTasksByProject
+import network.apiGetProgrammers
 
 class ProjectScreen(private val project: Project) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
-        var isLoading by remember { mutableStateOf(true) }
+        var programmers by remember { mutableStateOf<List<Programmer>>(emptyList()) }
+        var isLoadingTasks by remember { mutableStateOf(true) }
+        var isLoadingProgrammers by remember { mutableStateOf(true) }
         var showDialog by remember { mutableStateOf(false) }
         var recomposeTrigger by remember { mutableStateOf(false) }
 
-        val scrollState = rememberLazyListState()
         val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(project.id, recomposeTrigger) {
-            isLoading = true
+            isLoadingTasks = true
             apiGetTasksByProject(
                 projectId = project.id,
                 onSuccessResponse = { fetchedTasks ->
                     tasks = fetchedTasks
-                    isLoading = false
+                    isLoadingTasks = false
                 },
                 onError = {
-                    isLoading = false
+                    isLoadingTasks = false
+                }
+            )
+        }
+
+        LaunchedEffect(Unit) {
+            isLoadingProgrammers = true
+            apiGetProgrammers(
+                onSuccessResponse = { fetchedProgrammers ->
+                    programmers = fetchedProgrammers
+                    isLoadingProgrammers = false
+                },
+                onError = {
+                    isLoadingProgrammers = false
                 }
             )
         }
@@ -83,7 +96,7 @@ class ProjectScreen(private val project: Project) : Screen {
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                if (isLoading) {
+                if (isLoadingTasks) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                 } else if (tasks.isEmpty()) {
                     Text(
@@ -92,22 +105,11 @@ class ProjectScreen(private val project: Project) : Screen {
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 } else {
-                    LazyRow(
-                        state = scrollState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .draggable(
-                                orientation = Orientation.Horizontal,
-                                state = rememberDraggableState { delta ->
-                                    coroutineScope.launch {
-                                        scrollState.scrollBy(-delta)
-                                    }
-                                }
-                            ),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().height(200.dp)
                     ) {
                         items(tasks) { task ->
-                            TaskItem(task = task)
+                            TaskItem(task = task, navigator = navigator)
                         }
                     }
                 }
@@ -121,6 +123,32 @@ class ProjectScreen(private val project: Project) : Screen {
                         Icon(imageVector = Icons.Filled.Add, contentDescription = "Añadir tarea", tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = "Añadir Tarea", style = TextStyle(fontSize = 18.sp, color = Color.White))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Asignar Programadores",
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF005F73)),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (isLoadingProgrammers) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else if (programmers.isEmpty()) {
+                    Text(
+                        text = "No hay programadores disponibles",
+                        style = TextStyle(fontSize = 16.sp, color = Color.Gray),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                    ) {
+                        items(programmers) { programmer ->
+                            ProgrammerItem(programmer = programmer)
+                        }
                     }
                 }
             }
@@ -140,9 +168,12 @@ class ProjectScreen(private val project: Project) : Screen {
 }
 
 @Composable
-fun TaskItem(task: Task) {
+fun TaskItem(task: Task, navigator: cafe.adriel.voyager.navigator.Navigator) {
     Card(
-        modifier = Modifier.width(220.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable { navigator.push(TasksScreen(task)) },
         shape = RoundedCornerShape(12.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
@@ -157,11 +188,38 @@ fun TaskItem(task: Task) {
                 text = task.descripcion,
                 style = TextStyle(fontSize = 14.sp, color = Color.Black)
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Programador ID: ${task.programador}",
-                style = TextStyle(fontSize = 12.sp, color = Color.Gray)
-            )
+        }
+    }
+}
+
+@Composable
+fun ProgrammerItem(programmer: Programmer) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(imageVector = Icons.Filled.Person, contentDescription = "Programador", tint = Color(0xFF0A9396))
+            Spacer(modifier = Modifier.width(8.dp))
+            Column {
+                Text(
+                    text = programmer.nombre,
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                )
+                Text(
+                    text = "Email: ${programmer.email}",
+                    style = TextStyle(fontSize = 14.sp, color = Color.Gray)
+                )
+                Text(
+                    text = "Área: ${programmer.area}",
+                    style = TextStyle(fontSize = 14.sp, color = Color.Gray)
+                )
+            }
         }
     }
 }
