@@ -15,12 +15,15 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import models.Programmer
 import models.Task
 
-class TasksScreen(private val task: Task) : Screen {
+class TasksScreen(private val task: Task, private val programmers: List<Programmer>) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
+        val programadorNombre = programmers.find { it.programador_id == task.programador }?.nombre ?: "Desconocido"
 
         Scaffold(
             topBar = {
@@ -70,7 +73,7 @@ class TasksScreen(private val task: Task) : Screen {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Programador: ${task.programador}",
+                            text = "Programador: $programadorNombre",
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 color = Color.Gray
